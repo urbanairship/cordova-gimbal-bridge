@@ -1,0 +1,41 @@
+{
+  "name": "urbanairship-gimbal-cordova",
+  "version": "1.0.0",
+  "description": "Urban Airship Cordova Gimbal plugin",
+  "cordova": {
+    "id": "urbanairship-gimbal-cordova",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/urbanairship/phonegap-gimbal-plugin"
+  },
+  "keywords": [
+    "cordova",
+    "urbanairship",
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=5.4.0"
+    },
+    {
+      "name": "cordova-ios",
+      "version": ">=3.9.0"
+    },
+    {
+      "name": "cordova-plugman",
+      "version": ">=4.2.0"
+    }
+  ],
+  "author": "Urban Airship",
+  "license": "Apache 2.0",
+  "bugs": {
+    "email": "support@urbanairship.com"
+  },
+  "homepage": "https://github.com/urbanairship/phonegap-gimbal-plugin#readme"
+}
