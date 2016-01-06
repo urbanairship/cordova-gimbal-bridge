@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="urbanairship-gimbal-cordova"
-    version="1.0.1">
+    version="1.0.5">
 
     <name>Urban Airship Gimbal Plugin</name>
     <description>Urban Airship Gimbal plugin for Cordova</description>
@@ -27,7 +27,7 @@
             </feature>
         </config-file>
 
-        <hook type="after_prepare" src="scripts/hook-symlink-fix.js" />
+        <hook type="before_compile" src="scripts/fix-gimbal-symlink.sh" />
 
         <!-- Set Usage Description to an empty string -->
         <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
