@@ -1,9 +1,17 @@
 # Urban Airship Gimbal PhoneGap/Cordova Plugin
 
-
 Requirements:
  - Cordova 5.4.0+, and Cordova iOS 3.9.0+, urbanairship-cordova plugin
 
+## Installation
+
+1. Install this plugin using PhoneGap/Cordova CLI:
+
+        cordova plugin add urbanairship-gimbal-bridge-cordova
+
+2. Add your Gimbal API key to the config.xml file:
+
+        <preference name="com.urbanairship.gimbal_api_key" value="Your Gimbal API Key" />
 
 ## Contributing Code
 
