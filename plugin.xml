@@ -9,13 +9,14 @@
     <license>Apache 2.0</license>
     <keywords>gimbal,cordova,urbanairship</keywords>
     <repo>https://github.com/urbanairship/phonegap-gimbal-plugin</repo>
-    
+
     <engines>
         <engine name="cordova" version=">=5.4.0" />
         <engine name="cordova-plugman" version=">=4.2.0" />
     </engines>
 
     <dependency id="urbanairship-cordova" />
+    <dependency id="urbanairship-gimbal-sdk-cordova" url="https://github.com/urbanairship/cordova-gimbal-sdk" commit="b2d78645b735c1bd74d6abf290981a91f2ab02db"/> />
 
     <!-- ios -->
     <platform name="ios">
@@ -27,25 +28,13 @@
             </feature>
         </config-file>
 
-        <hook type="before_compile" src="scripts/fix-gimbal-symlink.sh" />
-
-        <!-- Set Usage Description to an empty string -->
-        <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
-            <string></string>
-        </config-file>
-
+        <!-- Plugin -->
         <header-file src="src/ios/GimbalPlugin.h" />
         <source-file src="src/ios/GimbalPlugin.m" />
 
-        <!-- Gimbal framework -->
-        <framework src="src/ios/Gimbal.framework" custom="true" />
-        
-        <!-- Gimbal Adapter header and source -->
+        <!-- Gimbal Adapter -->
         <header-file src="src/ios/GimbalAdapter.h" />
         <source-file src="src/ios/GimbalAdapter.m" />
 
-        <!-- system frameworks -->
-        <framework src="CoreLocation.framework" />
-        <framework src="libz.dylib" />
     </platform>
 </plugin>
