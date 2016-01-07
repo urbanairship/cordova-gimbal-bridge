@@ -1,16 +1,16 @@
 {
-  "name": "urbanairship-gimbal-cordova",
+  "name": "urbanairship-gimbal-bridge-cordova",
   "version": "1.0.6",
   "description": "Urban Airship Cordova Gimbal plugin",
   "cordova": {
-    "id": "urbanairship-gimbal-cordova",
+    "id": "urbanairship-gimbal-bridge-cordova",
     "platforms": [
       "ios"
     ]
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/urbanairship/phonegap-gimbal-plugin"
+    "url": "https://github.com/urbanairship/cordova-gimbal-bridge"
   },
   "keywords": [
     "cordova",
@@ -37,5 +37,5 @@
   "bugs": {
     "email": "support@urbanairship.com"
   },
-  "homepage": "https://github.com/urbanairship/phonegap-gimbal-plugin#readme"
+  "homepage": "https://github.com/urbanairship/cordova-gimbal-bridge#readme"
 }

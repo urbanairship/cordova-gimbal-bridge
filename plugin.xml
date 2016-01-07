@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="urbanairship-gimbal-cordova"
+    id="urbanairship-gimbal-bridge-cordova"
     version="1.0.6">
 
     <name>Urban Airship Gimbal Plugin</name>
     <description>Urban Airship Gimbal plugin for Cordova</description>
     <license>Apache 2.0</license>
     <keywords>gimbal,cordova,urbanairship</keywords>
-    <repo>https://github.com/urbanairship/phonegap-gimbal-plugin</repo>
+    <repo>https://github.com/urbanairship/cordova-gimbal-bridge</repo>
 
     <engines>
         <engine name="cordova" version=">=5.4.0" />
