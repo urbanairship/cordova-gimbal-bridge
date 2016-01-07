@@ -1,4 +1,10 @@
 ==============================
+Version 1.1.0 - Jan 7, 2016
+==============================
+ - Updated README with install instructions
+ - Fixed package version
+
+==============================
 Version 1.0.0 - Jan 7, 2016
 ==============================
  - Added Gimbal Plugin.

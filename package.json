@@ -1,6 +1,6 @@
 {
   "name": "urbanairship-gimbal-bridge-cordova",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Urban Airship Cordova Gimbal plugin",
   "cordova": {
     "id": "urbanairship-gimbal-bridge-cordova",
