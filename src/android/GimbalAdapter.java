@@ -28,7 +28,6 @@ import com.urbanairship.Logger;
 import com.urbanairship.UAirship;
 import com.urbanairship.location.RegionEvent;
 
-import com.gimbal.android.Gimbal;
 import com.gimbal.android.PlaceManager;
 import com.gimbal.android.PlaceEventListener;
 import com.gimbal.android.Place;
@@ -46,22 +45,20 @@ public class GimbalAdapter {
 	private Boolean _started = false;
 	private PlaceManager _placeManager = PlaceManager.getInstance();
 	
-	private PlaceEventListener _placeEventListener = new PlaceEventListener(){
-		public void onVisitStart(Visit visit) {
-			Logger.debug("Entered a Gimbal Place: " + visit.place.name + " on the following date: " + visit.arrivalDate);
-			
-			reportPlaceEventToAnalytics(visit.place, RegionEvent.BOUNDARY_EVENT_ENTER);
-		}
-		
-		public void onVisitEnd(Visit visit) {
-			Logger.debug("Exited a Gimbal Place: " + visit.place.name + " Entrance date:" + visit.arrivalDate + " Exit Date:" + visit.departureDate);
-			
-			reportPlaceEventToAnalytics(visit.place, RegionEvent.BOUNDARY_EVENT_EXIT);
-		}
-	}
-	
 	private GimbalAdapter(){
-		_placeManager.addListener(_placeEventListener);
+		_placeManager.addListener(new PlaceEventListener(){
+			public void onVisitStart(Visit visit) {
+				Logger.debug("Entered a Gimbal Place: " + visit.getPlace().getName() + " on the following date: " + visit.getArrivalTimeInMillis());
+				
+				reportPlaceEventToAnalytics(visit.getPlace(), RegionEvent.BOUNDARY_EVENT_ENTER);
+			}
+			
+			public void onVisitEnd(Visit visit) {
+				Logger.debug("Exited a Gimbal Place: " + visit.getPlace().getName() + " Entrance date:" + visit.getArrivalTimeInMillis() + " Exit Date:" + visit.getDepartureTimeInMillis());
+				
+				reportPlaceEventToAnalytics(visit.getPlace(), RegionEvent.BOUNDARY_EVENT_EXIT);
+			}
+		});
 	}
 	
 	public void startAdapter(){
@@ -87,7 +84,7 @@ public class GimbalAdapter {
 	}
 	
 	private void reportPlaceEventToAnalytics(Place place, int boundaryEvent){
-		RegionEvent regionEvent = new RegionEvent(place.identifier, K_SOURCE, boundaryEvent);
-		UAirship.shared().analytics.addEvent(regionEvent);
+		RegionEvent regionEvent = new RegionEvent(place.getIdentifier(), K_SOURCE, boundaryEvent);
+		UAirship.shared().getAnalytics().addEvent(regionEvent);
 	}
 }

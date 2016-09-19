@@ -24,23 +24,35 @@
  */
 package com.urbanairship.cordova.gimbal;
 
+import android.content.Context;
+import android.content.res.XmlResourceParser;
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+
 import com.urbanairship.Logger;
 import com.urbanairship.UAirship;
 
 import com.gimbal.android.Gimbal;
 
-public class GimbalPlugin {
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class GimbalPlugin extends Service {
 	
-	private static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
+	static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
+	static final String UA_PREFIX = "com.urbanairship";
 	
 	private PluginConfig pluginConfig;
 	
-	public GimbalPlugin(){
+	@Override
+    public void onCreate(){
 		Context context = UAirship.getApplicationContext();
 		PluginConfig pluginConfig = getPluginConfig(context);
 		
 		String gimbalKey = pluginConfig.getString(GIMBAL_KEY, "");
-		if (!gimbalKey){
+		if (gimbalKey.equals("")){
 			Logger.error("No Gimbal API key found, Gimbal cordova plugin initialization failed.");
 			return;
 		}
@@ -50,6 +62,11 @@ public class GimbalPlugin {
 		
 		GimbalAdapter.getInstance().startAdapter();
 	}
+	
+	@Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
 	
 	/**
      * Gets the config for the Urban Airship plugin.
