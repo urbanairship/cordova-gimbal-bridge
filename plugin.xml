@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="urbanairship-gimbal-bridge-cordova"
-    version="1.1.0">
+    version="2.0.0">
 
     <name>Urban Airship Gimbal Plugin</name>
     <description>Urban Airship Gimbal plugin for Cordova</description>
@@ -36,5 +36,18 @@
         <header-file src="src/ios/GimbalAdapter.h" />
         <source-file src="src/ios/GimbalAdapter.m" />
 
+    </platform>
+    
+    <!-- android -->
+    <platform name="android">
+		<config-file target="res/xml/config.xml" parent="/widget">
+            <feature name="GimbalPlugin">
+                <param name="android-package" value="com.urbanairship.cordova.gimbal.GimbalPlugin"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+		
+		<source-file src="src/android/GimbalAdapter.java" target-dir="src/com/urbanairship/cordova/gimbal" />
+		<source-file src="src/android/GimbalPlugin.java" target-dir="src/com/urbanairship/cordova/gimbal" />
     </platform>
 </plugin>
