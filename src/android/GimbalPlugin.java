@@ -24,11 +24,13 @@
  */
 package com.urbanairship.cordova.gimbal;
 
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaWebView;
+
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.app.Application;
 
 import com.urbanairship.Logger;
 import com.urbanairship.UAirship;
@@ -39,7 +41,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class GimbalPlugin extends Service {
+public class GimbalPlugin extends CordovaPlugin {
 	
 	static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
 	static final String UA_PREFIX = "com.urbanairship";
@@ -47,9 +49,12 @@ public class GimbalPlugin extends Service {
 	private PluginConfig pluginConfig;
 	
 	@Override
-    public void onCreate(){
-		Context context = UAirship.getApplicationContext();
-		PluginConfig pluginConfig = getPluginConfig(context);
+	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+		super.initialize(cordova, webView);
+		
+		//Context context = UAirship.getApplicationContext();
+		Application application = cordova.getActivity().getApplication();
+		PluginConfig pluginConfig = getPluginConfig(application);
 		
 		String gimbalKey = pluginConfig.getString(GIMBAL_KEY, "");
 		if (gimbalKey.equals("")){
@@ -58,15 +63,9 @@ public class GimbalPlugin extends Service {
 		}
 		Logger.info("Initializing Urban Airship Gimbal cordova plugin.");
 		
-		Gimbal.setApiKey(this.getApplication(), gimbalKey);
-		
+		Gimbal.setApiKey(application, gimbalKey);
 		GimbalAdapter.getInstance().startAdapter();
 	}
-	
-	@Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 	
 	/**
      * Gets the config for the Urban Airship plugin.
