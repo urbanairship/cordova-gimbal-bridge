@@ -64,7 +64,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		Logger.info("Initializing Urban Airship Gimbal cordova plugin.");
 		
 		Gimbal.setApiKey(application, gimbalKey);
-		GimbalAdapter.getInstance().startAdapter();
+		GimbalAdapter.shared().start();
 	}
 	
 	/**
@@ -152,6 +152,5 @@ public class GimbalPlugin extends CordovaPlugin {
                 }
             }
         }
-
     }
 }

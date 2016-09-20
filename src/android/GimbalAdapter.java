@@ -1,90 +1,106 @@
 /*
- Copyright 2009-2015 Urban Airship Inc. All rights reserved.
- 
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
- 
- 1. Redistributions of source code must retain the above copyright notice, this
- list of conditions and the following disclaimer.
- 
- 2. Redistributions in binary form must reproduce the above copyright notice,
- this list of conditions and the following disclaimer in the documentation
- and/or other materials provided with the distribution.
- 
- THIS SOFTWARE IS PROVIDED BY THE URBAN AIRSHIP INC ``AS IS'' AND ANY EXPRESS OR
- IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- EVENT SHALL URBAN AIRSHIP INC OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Copyright 2015 Urban Airship and Contributors
  */
 package com.urbanairship.cordova.gimbal;
 
-import com.urbanairship.Logger;
-import com.urbanairship.UAirship;
-import com.urbanairship.location.RegionEvent;
+import android.util.Log;
 
-import com.gimbal.android.PlaceManager;
 import com.gimbal.android.PlaceEventListener;
+import com.gimbal.android.PlaceManager;
 import com.gimbal.android.Place;
 import com.gimbal.android.Visit;
+import com.urbanairship.UAirship;
+import com.urbanairship.location.RegionEvent;
+import com.urbanairship.util.DateUtils;
 
+/**
+ * GimbalAdapter interfaces Gimbal SDK functionality with Urban Airship services.
+ */
 public class GimbalAdapter {
-	
-	private static final String K_SOURCE = "Gimbal";
-	
-	private static GimbalAdapter _instance = new GimbalAdapter();
-	public static GimbalAdapter getInstance(){
-		return _instance;
-	}
-	
-	private Boolean _started = false;
-	private PlaceManager _placeManager = PlaceManager.getInstance();
-	
-	private GimbalAdapter(){
-		_placeManager.addListener(new PlaceEventListener(){
-			public void onVisitStart(Visit visit) {
-				Logger.debug("Entered a Gimbal Place: " + visit.getPlace().getName() + " on the following date: " + visit.getArrivalTimeInMillis());
-				
-				reportPlaceEventToAnalytics(visit.getPlace(), RegionEvent.BOUNDARY_EVENT_ENTER);
-			}
-			
-			public void onVisitEnd(Visit visit) {
-				Logger.debug("Exited a Gimbal Place: " + visit.getPlace().getName() + " Entrance date:" + visit.getArrivalTimeInMillis() + " Exit Date:" + visit.getDepartureTimeInMillis());
-				
-				reportPlaceEventToAnalytics(visit.getPlace(), RegionEvent.BOUNDARY_EVENT_EXIT);
-			}
-		});
-	}
-	
-	public void startAdapter(){
-		if (_started) {
-			return;
-		}
-		_started = true;
-		
-		_placeManager.startMonitoring();
-		
-		Logger.debug("Started Gimbal Adapter.");
-	}
-	
-	public void stopAdapter(){
-		if (!_started) {
-			return;
-		}
-		_started = false;
-		
-		_placeManager.stopMonitoring();
-		
-		Logger.debug("Stopped Gimbal Adapter.");
-	}
-	
-	private void reportPlaceEventToAnalytics(Place place, int boundaryEvent){
-		RegionEvent regionEvent = new RegionEvent(place.getIdentifier(), K_SOURCE, boundaryEvent);
-		UAirship.shared().getAnalytics().addEvent(regionEvent);
-	}
+
+    /**
+     * GimbalAdapter logging tag.
+     */
+    private static final String TAG = "GimbalAdapter ";
+
+    /**
+     * GimbalAdapter shared instance.
+     */
+    private static GimbalAdapter instance = new GimbalAdapter();
+
+    /**
+     * Analytics event source.
+     */
+    private static final String SOURCE = "Gimbal";
+
+    /**
+     * Boolean representing the started state of the GimbalAdapter.
+     */
+    private boolean isStarted = false;
+
+    /**
+     * Listener for Gimbal place events. Creates an analytics event
+     * corresponding to boundary event type.
+     */
+    private PlaceEventListener placeEventListener = new PlaceEventListener() {
+        @Override
+        public void onVisitStart(Visit visit) {
+            Log.i(TAG, "Entered place: " + visit.getPlace().getName() + "Entrance date: " +
+                    DateUtils.createIso8601TimeStamp(visit.getArrivalTimeInMillis()));
+            RegionEvent enter = new RegionEvent(visit.getPlace().getIdentifier(), SOURCE, RegionEvent.BOUNDARY_EVENT_ENTER);
+            UAirship.shared().getAnalytics().addEvent(enter);
+        }
+
+        @Override
+        public void onVisitEnd(Visit visit) {
+            Log.i(TAG, "Exited place: " + visit.getPlace().getName() + "Entrance date: " +
+                    DateUtils.createIso8601TimeStamp(visit.getArrivalTimeInMillis()) + "Exit date:" +
+                    DateUtils.createIso8601TimeStamp(visit.getDepartureTimeInMillis()));
+            RegionEvent exit = new RegionEvent(visit.getPlace().getIdentifier(), SOURCE, RegionEvent.BOUNDARY_EVENT_EXIT);
+            UAirship.shared().getAnalytics().addEvent(exit);
+        }
+    };
+
+
+    /**
+     * Hidden to support the singleton pattern.
+     */
+    GimbalAdapter() {}
+
+    /**
+     * GimbalAdapter shared instance.
+     */
+    public synchronized static GimbalAdapter shared() {
+        return instance;
+    }
+
+    /**
+     * Starts tracking places.
+     */
+    public void start() {
+        if (isStarted) {
+            return;
+        }
+
+        isStarted = true;
+
+        PlaceManager.getInstance().addListener(placeEventListener);
+        PlaceManager.getInstance().startMonitoring();
+        Log.i(TAG, "Adapter Started");
+    }
+
+    /**
+     * Stops tracking places.
+     */
+    public void stop() {
+        if (!isStarted) {
+            return;
+        }
+        isStarted = false;
+
+        PlaceManager.getInstance().stopMonitoring();
+        PlaceManager.getInstance().removeListener(placeEventListener);
+
+        Log.i(TAG, "Adapter Stopped");
+    }
 }
