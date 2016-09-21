@@ -33,11 +33,10 @@
 
 // Config keys
 NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
+BOOL *const GimbalAutoStart = @"com.urbanairship.gimbal_auto_start";
 
 
 - (void)pluginInitialize {
-    
-    
     
     NSDictionary *settings = self.commandDelegate.settings;
     
@@ -51,7 +50,37 @@ NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
 
     [Gimbal setAPIKey:settings[GimbalAPIKey] options:nil];
     
+    if (settings[GimbalAutoStart]) {
+        if (GimbalAutoStart) {
+            [[GimbalAdapter shared] startAdapter];
+        }
+    }
+}
+
+- (void)start:(CDVInvokedUrlCommand *)command {
+    [self performCallbackWithCommand:command withBlock:^(NSArray *args, UACordovaCompletionHandler completionHandler) {
+        [self startGimbal]
+        completionHandler(CDVCommandStatus_OK, nil);
+    }];
+}
+
+- (void)stop:(CDVInvokedUrlCommand *)command {
+    [self performCallbackWithCommand:command withBlock:^(NSArray *args, UACordovaCompletionHandler completionHandler) {
+        [self stopGimbal]
+        completionHandler(CDVCommandStatus_OK, nil);
+    }];
+}
+
+- (void)startGimbal {
+
     [[GimbalAdapter shared] startAdapter];
+
+}
+
+- (void)stopGimbal {
+
+    [[GimbalAdapter shared] stopAdapter];
+
 }
 
 @end
