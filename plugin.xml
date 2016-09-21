@@ -18,7 +18,7 @@
     <dependency id="urbanairship-cordova" />
     <dependency id="urbanairship-gimbal-sdk-cordova" url="https://github.com/urbanairship/cordova-gimbal-sdk"/>
     
-    <js-module src="www/UrbanAirship.js" name="UrbanAirship">
+    <js-module src="www/UAGimbal.js" name="UrbanAirship">
 		<clobbers target="UAGimbal" />
 	</js-module>
     

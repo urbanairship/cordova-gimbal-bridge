@@ -56,7 +56,7 @@ public class GimbalPlugin extends CordovaPlugin {
 	private static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
 	private static final String UA_PREFIX = "com.urbanairship";
 	
-	private static final int PERMISSION_REQUEST_CODE_LOCATION = 100;
+	private static final int PERMISSION_REQUEST_CODE_LOCATION = 0;
 	private static final String PERMISSION_DENIED_ERROR = "permission denied";
 	
 	/**
@@ -70,7 +70,7 @@ public class GimbalPlugin extends CordovaPlugin {
     
 	private ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private PluginConfig pluginConfig;
-	private CallbackContext startCallbackContext = null;
+	private CallbackContext callbackContext = null;
 	
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -102,7 +102,7 @@ public class GimbalPlugin extends CordovaPlugin {
             return false;
         }
         
-        executorService.execute(new Runnable() {
+        executorService.execute(new Runnable(){
             @Override
             public void run() {
                 try {
@@ -120,7 +120,7 @@ public class GimbalPlugin extends CordovaPlugin {
     }
     
     public void start(JSONArray data, CallbackContext callbackContext){
-		startCallbackContext = callbackContext;
+		this.callbackContext = callbackContext;
 		start();
     }
     public void start(){
@@ -151,9 +151,9 @@ public class GimbalPlugin extends CordovaPlugin {
     public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
 		for(int r:grantResults){
 			if(r == PackageManager.PERMISSION_DENIED){
-				if (startCallbackContext != null){
-					startCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR));
-					startCallbackContext = null;					
+				if (callbackContext != null){
+					callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR));
+					callbackContext = null;					
 				}
 				return;
 			}
@@ -162,18 +162,18 @@ public class GimbalPlugin extends CordovaPlugin {
 			case PERMISSION_REQUEST_CODE_LOCATION:
 				try {
 					doStart();
-					if (startCallbackContext != null){
-						startCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+					if (callbackContext != null){
+						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
 					}
 				} catch (Exception e) {
                     Logger.error("doStart: ", e);
-					if (startCallbackContext != null){
-						startCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+					if (callbackContext != null){
+						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
 					}
                 }
 				break;
 		}
-		startCallbackContext = null;
+		callbackContext = null;
 	}
 	
 	/**

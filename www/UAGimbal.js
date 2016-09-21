@@ -29,7 +29,7 @@ var cordova = require("cordova"),
 // Helper method to call into the native plugin
 function callNative(success, failure, name, args) {
   args = args || []
-  exec(success, failure, "UAGimbal", name, args)
+  exec(success, failure, "GimbalPlugin", name, args)
 }
 
 /**
