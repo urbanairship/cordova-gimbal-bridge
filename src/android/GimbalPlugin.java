@@ -27,27 +27,50 @@ package com.urbanairship.cordova.gimbal;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.app.Application;
+import android.Manifest;
+import android.content.pm.PackageManager;
 
 import com.urbanairship.Logger;
-import com.urbanairship.UAirship;
-
 import com.gimbal.android.Gimbal;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GimbalPlugin extends CordovaPlugin {
 	
-	static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
-	static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
-	static final String UA_PREFIX = "com.urbanairship";
+	private static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
+	private static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
+	private static final String UA_PREFIX = "com.urbanairship";
 	
+	private static final int PERMISSION_REQUEST_CODE_LOCATION = 100;
+	private static final String PERMISSION_DENIED_ERROR = "permission denied";
+	
+	/**
+     * List of Cordova "actions". To extend the plugin, add the action below and then define the method
+     * with the signature `void <CORDOVA_ACTION>(JSONArray data, final CallbackContext callbackContext)`
+     * and it will automatically be called. All methods will be executed in the ExecutorService. Any
+     * exceptions thrown by the actions are automatically caught and the callbackContext will return
+     * an error result.
+     */
+    private static final List<String> KNOWN_ACTIONS = Arrays.asList("start", "stop");
+    
+	private ExecutorService executorService = Executors.newFixedThreadPool(1);
 	private PluginConfig pluginConfig;
+	private CallbackContext startCallbackContext = null;
 	
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -55,7 +78,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		
 		//Context context = UAirship.getApplicationContext();
 		Application application = cordova.getActivity().getApplication();
-		PluginConfig pluginConfig = getPluginConfig(application);
+		pluginConfig = getPluginConfig(application);
 		
 		String gimbalKey = pluginConfig.getString(GIMBAL_KEY, "");
 		if (gimbalKey.equals("")){
@@ -67,9 +90,90 @@ public class GimbalPlugin extends CordovaPlugin {
 		Gimbal.setApiKey(application, gimbalKey);
 		
 		//Auto-start
-		if (pluginConfig.getString(GIMBAL_AUTO_START, true) == true){
-			GimbalAdapter.shared().start();
+		if (pluginConfig.getBoolean(GIMBAL_AUTO_START, true)){
+			start();
 		}
+	}
+	
+	@Override
+    public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext){
+        if (!KNOWN_ACTIONS.contains(action)) {
+            Logger.debug("Invalid action: " + action);
+            return false;
+        }
+        
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Logger.debug("Plugin Execute: " + action);
+                    Method method = GimbalPlugin.class.getDeclaredMethod(action, JSONArray.class, CallbackContext.class);
+                    method.invoke(GimbalPlugin.this, data, callbackContext);
+                } catch (Exception e) {
+                    Logger.error("Action failed to execute: " + action, e);
+                    callbackContext.error("Action " + action + " failed with exception: " + e.getMessage());
+                }
+            }
+        });
+
+        return true;
+    }
+    
+    public void start(JSONArray data, CallbackContext callbackContext){
+		startCallbackContext = callbackContext;
+		start();
+    }
+    public void start(){
+		//Android M permissions
+		if (cordova.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
+			doStart();
+		} else {
+			String[] permissions = {
+				Manifest.permission.ACCESS_COARSE_LOCATION,
+				Manifest.permission.ACCESS_FINE_LOCATION
+			};
+			cordova.requestPermissions(this, PERMISSION_REQUEST_CODE_LOCATION, permissions);
+		}
+    }
+    private void doStart(){
+		GimbalAdapter.shared().start();
+    }
+    
+    public void stop(JSONArray data, CallbackContext callbackContext){
+		stop();
+		callbackContext.success();
+    }
+    public void stop(){
+		GimbalAdapter.shared().stop();
+    }
+    
+    @Override
+    public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+		for(int r:grantResults){
+			if(r == PackageManager.PERMISSION_DENIED){
+				if (startCallbackContext != null){
+					startCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR));
+					startCallbackContext = null;					
+				}
+				return;
+			}
+		}
+		switch(requestCode){
+			case PERMISSION_REQUEST_CODE_LOCATION:
+				try {
+					doStart();
+					if (startCallbackContext != null){
+						startCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+					}
+				} catch (Exception e) {
+                    Logger.error("doStart: ", e);
+					if (startCallbackContext != null){
+						startCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+					}
+                }
+				break;
+		}
+		startCallbackContext = null;
 	}
 	
 	/**
@@ -78,7 +182,7 @@ public class GimbalPlugin extends CordovaPlugin {
      * @param context The application context.
      * @return The plugin config.
      */
-    public PluginConfig getPluginConfig(Context context) {
+    private PluginConfig getPluginConfig(Context context) {
         if (pluginConfig == null) {
             pluginConfig = new PluginConfig(context);
         }
