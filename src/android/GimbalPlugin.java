@@ -44,6 +44,7 @@ import java.util.Map;
 public class GimbalPlugin extends CordovaPlugin {
 	
 	static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
+	static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
 	static final String UA_PREFIX = "com.urbanairship";
 	
 	private PluginConfig pluginConfig;
@@ -64,7 +65,11 @@ public class GimbalPlugin extends CordovaPlugin {
 		Logger.info("Initializing Urban Airship Gimbal cordova plugin.");
 		
 		Gimbal.setApiKey(application, gimbalKey);
-		GimbalAdapter.shared().start();
+		
+		//Auto-start
+		if (pluginConfig.getString(GIMBAL_AUTO_START, true) == true){
+			GimbalAdapter.shared().start();
+		}
 	}
 	
 	/**
