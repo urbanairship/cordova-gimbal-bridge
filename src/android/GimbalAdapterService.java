@@ -83,7 +83,7 @@ public class GimbalAdapterService extends Service {
 		msg.obj = intent;
 		serviceHandler.sendMessage(msg);
 		
-		return START_NOT_STICKY;
+		return START_REDELIVER_INTENT;
 	}
 	
 	@Override
