@@ -24,7 +24,6 @@
     
     <!-- ios -->
     <platform name="ios">
-
         <config-file target="config.xml" parent="/widget">
             <feature name="GimbalPlugin">
                 <param name="ios-package" value="GimbalPlugin" />
@@ -39,7 +38,6 @@
         <!-- Gimbal Adapter -->
         <header-file src="src/ios/GimbalAdapter.h" />
         <source-file src="src/ios/GimbalAdapter.m" />
-
     </platform>
     
     <!-- android -->
@@ -50,6 +48,14 @@
                 <param name="onload" value="true" />
             </feature>
         </config-file>
+        
+        <!-- GimbalAdapter service -->
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+			<service
+				android:name="com.urbanairship.cordova.gimbal.GimbalAdapterService"
+				android:exported="false" >
+			</service>
+		</config-file>
 		
 		<source-file src="src/android/GimbalAdapter.java" target-dir="src/com/urbanairship/cordova/gimbal" />
 		<source-file src="src/android/GimbalPlugin.java" target-dir="src/com/urbanairship/cordova/gimbal" />

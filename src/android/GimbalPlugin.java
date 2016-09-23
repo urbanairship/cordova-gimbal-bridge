@@ -32,14 +32,15 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.app.Application;
+import android.app.Activity;
+import android.Manifest;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
-import android.app.Application;
-import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.Intent;
 
 import com.urbanairship.Logger;
-import com.gimbal.android.Gimbal;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -51,6 +52,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class GimbalPlugin extends CordovaPlugin {
+	
+	public static final String SERVICE_PARAM_GIMBAL_KEY = "gimbalKey";
 	
 	private static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
 	private static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
@@ -72,6 +75,8 @@ public class GimbalPlugin extends CordovaPlugin {
 	private PluginConfig pluginConfig;
 	private CallbackContext callbackContext = null;
 	
+	private String gimbalKey;
+	
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
@@ -80,14 +85,12 @@ public class GimbalPlugin extends CordovaPlugin {
 		Application application = cordova.getActivity().getApplication();
 		pluginConfig = getPluginConfig(application);
 		
-		String gimbalKey = pluginConfig.getString(GIMBAL_KEY, "");
+		gimbalKey = pluginConfig.getString(GIMBAL_KEY, "");
 		if (gimbalKey.equals("")){
 			Logger.error("No Gimbal API key found, Gimbal cordova plugin initialization failed.");
 			return;
 		}
 		Logger.info("Initializing Urban Airship Gimbal cordova plugin.");
-		
-		Gimbal.setApiKey(application, gimbalKey);
 		
 		//Auto-start
 		if (pluginConfig.getBoolean(GIMBAL_AUTO_START, true)){
@@ -136,7 +139,10 @@ public class GimbalPlugin extends CordovaPlugin {
 		}
     }
     private void doStart(){
-		GimbalAdapter.shared().start();
+		Activity activity = cordova.getActivity();
+		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
+		serviceIntent.putExtra(SERVICE_PARAM_GIMBAL_KEY, gimbalKey);
+		activity.startService(serviceIntent);
     }
     
     public void stop(JSONArray data, CallbackContext callbackContext){
@@ -144,7 +150,8 @@ public class GimbalPlugin extends CordovaPlugin {
 		callbackContext.success();
     }
     public void stop(){
-		GimbalAdapter.shared().stop();
+		Activity activity = cordova.getActivity();
+		activity.stopService(new Intent(activity, GimbalAdapterService.class));
     }
     
     @Override
