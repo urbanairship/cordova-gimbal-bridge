@@ -6,16 +6,65 @@ package com.urbanairship.cordova.gimbal;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
+import android.util.Log;
 
 import com.gimbal.android.Gimbal;
 
 public class GimbalAdapterService extends Service {
 	public static final String SERVICE_PARAM_GIMBAL_KEY = "gimbalKey";
 	
+	private static final int MSG_INTENT_RECEIVED = 1;
+    private static final int MSG_INTENT_JOB_FINISHED = 2;
+	
+	private Looper serviceLooper;
+	private ServiceHandler serviceHandler;
+	private String gimbalKey = null;
+	
+	private final class ServiceHandler extends Handler {
+		public ServiceHandler(Looper looper){
+			super(looper);
+		}
+		@Override
+		public void handleMessage(Message msg){
+			int startId = msg.arg1;
+			switch (msg.what){
+				case MSG_INTENT_RECEIVED:
+					Log.i("GimbalAdapterService", "startThread");
+					GimbalAdapter.shared().start();
+					break;
+				case MSG_INTENT_JOB_FINISHED:
+					Log.i("GimbalAdapterService", "stopThread");
+					GimbalAdapter.shared().stop();
+					stopSelf(startId);
+					break;
+			}
+		}
+	}
+	
+	@Override
+	public void onCreate(){
+		super.onCreate();
+		
+		Log.i("GimbalAdapterService", "onCreate");
+		
+		HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
+		thread.start();
+		
+		serviceLooper = thread.getLooper();
+		serviceHandler = new ServiceHandler(serviceLooper);
+	}
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		super.onStartCommand(intent, flags, startId);
+		
+		Log.i("GimbalAdapterService", "onStartCommand");
 		
 		String gimbalKey = null;
 		if (intent != null){
@@ -27,16 +76,21 @@ public class GimbalAdapterService extends Service {
 		if (gimbalKey == null){
 			throw new IllegalArgumentException("Missing Gimbal API key");
 		}
-		
 		Gimbal.setApiKey(this.getApplication(), gimbalKey);
-		GimbalAdapter.shared().start();
 		
-		return START_REDELIVER_INTENT;
+		Message msg = serviceHandler.obtainMessage(MSG_INTENT_RECEIVED);
+		msg.arg1 = startId;
+		msg.obj = intent;
+		serviceHandler.sendMessage(msg);
+		
+		return START_NOT_STICKY;
 	}
 	
 	@Override
 	public void onDestroy(){
-		GimbalAdapter.shared().stop();
+		Log.i("GimbalAdapterService", "onDestroy");
+		
+		serviceLooper.quit();
 		
 		super.onDestroy();
 	}
