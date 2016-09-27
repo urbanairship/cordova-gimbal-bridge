@@ -93,6 +93,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		Logger.info("Initializing Urban Airship Gimbal cordova plugin.");
 		
 		//Auto-start
+		doStart(); //START SERVICE. THE SERVICE MUST BE RUNNING WHILE THE USER ACCEPTS PERMISSIONS
 		if (pluginConfig.getBoolean(GIMBAL_AUTO_START, true)){
 			start();
 		}

@@ -24,7 +24,6 @@ public class GimbalAdapterService extends Service {
 	
 	private Looper serviceLooper;
 	private ServiceHandler serviceHandler;
-	private String gimbalKey = null;
 	
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper){
