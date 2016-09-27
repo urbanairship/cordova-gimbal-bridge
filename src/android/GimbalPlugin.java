@@ -81,7 +81,6 @@ public class GimbalPlugin extends CordovaPlugin {
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
 		
-		//Context context = UAirship.getApplicationContext();
 		Application application = cordova.getActivity().getApplication();
 		pluginConfig = getPluginConfig(application);
 		
@@ -92,8 +91,11 @@ public class GimbalPlugin extends CordovaPlugin {
 		}
 		Logger.info("Initializing Urban Airship Gimbal cordova plugin.");
 		
+		//Start service and setApiKey without monitoring
+		//THE SERVICE MUST BE STARTED WITH THE API KEY SET BEFORE USER ACCEPTS PERMISSIONS!
+		doStart(Intent.ACTION_RUN);
+		
 		//Auto-start
-		doStart(); //START SERVICE. THE SERVICE MUST BE RUNNING WHILE THE USER ACCEPTS PERMISSIONS
 		if (pluginConfig.getBoolean(GIMBAL_AUTO_START, true)){
 			start();
 		}
@@ -139,9 +141,16 @@ public class GimbalPlugin extends CordovaPlugin {
 			cordova.requestPermissions(this, PERMISSION_REQUEST_CODE_LOCATION, permissions);
 		}
     }
+    
     private void doStart(){
+		doStart(null);
+	}
+    private void doStart(String action){
 		Activity activity = cordova.getActivity();
 		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
+		if (action != null){
+			serviceIntent.setAction(action);
+		}
 		serviceIntent.putExtra(SERVICE_PARAM_GIMBAL_KEY, gimbalKey);
 		activity.startService(serviceIntent);
     }

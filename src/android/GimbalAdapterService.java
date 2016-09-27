@@ -65,22 +65,29 @@ public class GimbalAdapterService extends Service {
 		
 		Log.i("GimbalAdapterService", "onStartCommand");
 		
-		String gimbalKey = null;
+		String action = null;
 		if (intent != null){
+			action = intent.getAction();
+			
+			//setApiKey
+			String gimbalKey = null;
 			Bundle extras = intent.getExtras();
 			if (extras != null){
 				gimbalKey = (String) extras.get(SERVICE_PARAM_GIMBAL_KEY);
 			}
+			if (gimbalKey == null){
+				throw new IllegalArgumentException("Missing Gimbal API key");
+			}
+			Gimbal.setApiKey(this.getApplication(), gimbalKey);
 		}
-		if (gimbalKey == null){
-			throw new IllegalArgumentException("Missing Gimbal API key");
-		}
-		Gimbal.setApiKey(this.getApplication(), gimbalKey);
 		
-		Message msg = serviceHandler.obtainMessage(MSG_INTENT_RECEIVED);
-		msg.arg1 = startId;
-		msg.obj = intent;
-		serviceHandler.sendMessage(msg);
+		//startMonitoring
+		if (!Intent.ACTION_RUN.equals(action)){
+			Message msg = serviceHandler.obtainMessage(MSG_INTENT_RECEIVED);
+			msg.arg1 = startId;
+			msg.obj = intent;
+			serviceHandler.sendMessage(msg);
+		}
 		
 		return START_REDELIVER_INTENT;
 	}
