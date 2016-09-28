@@ -153,6 +153,11 @@ public class GimbalPlugin extends CordovaPlugin {
 		}
 		serviceIntent.putExtra(SERVICE_PARAM_GIMBAL_KEY, gimbalKey);
 		activity.startService(serviceIntent);
+		
+		if (callbackContext != null){
+			callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+			callbackContext = null;
+		}
     }
     
     public void stop(JSONArray data, CallbackContext callbackContext){
@@ -179,17 +184,14 @@ public class GimbalPlugin extends CordovaPlugin {
 			case PERMISSION_REQUEST_CODE_LOCATION:
 				try {
 					doStart();
-					if (callbackContext != null){
-						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
-					}
 				} catch (Exception e) {
                     if (callbackContext != null){
 						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
+						callbackContext = null;
 					}
                 }
 				break;
 		}
-		callbackContext = null;
 	}
 	
 	/**
