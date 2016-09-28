@@ -183,8 +183,7 @@ public class GimbalPlugin extends CordovaPlugin {
 						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
 					}
 				} catch (Exception e) {
-                    Logger.error("doStart: ", e);
-					if (callbackContext != null){
+                    if (callbackContext != null){
 						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));
 					}
                 }

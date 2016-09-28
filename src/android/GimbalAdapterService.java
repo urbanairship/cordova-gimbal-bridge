@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
-import android.util.Log;
 
 import com.gimbal.android.Gimbal;
 
@@ -34,11 +33,9 @@ public class GimbalAdapterService extends Service {
 			int startId = msg.arg1;
 			switch (msg.what){
 				case MSG_INTENT_RECEIVED:
-					Log.i("GimbalAdapterService", "startThread");
 					GimbalAdapter.shared().start();
 					break;
 				case MSG_INTENT_JOB_FINISHED:
-					Log.i("GimbalAdapterService", "stopThread");
 					GimbalAdapter.shared().stop();
 					stopSelf(startId);
 					break;
@@ -50,8 +47,6 @@ public class GimbalAdapterService extends Service {
 	public void onCreate(){
 		super.onCreate();
 		
-		Log.i("GimbalAdapterService", "onCreate");
-		
 		HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
 		
@@ -62,8 +57,6 @@ public class GimbalAdapterService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		super.onStartCommand(intent, flags, startId);
-		
-		Log.i("GimbalAdapterService", "onStartCommand");
 		
 		String action = null;
 		if (intent != null){
@@ -94,8 +87,6 @@ public class GimbalAdapterService extends Service {
 	
 	@Override
 	public void onDestroy(){
-		Log.i("GimbalAdapterService", "onDestroy");
-		
 		serviceLooper.quit();
 		
 		super.onDestroy();
