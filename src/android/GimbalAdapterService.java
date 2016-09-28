@@ -37,7 +37,6 @@ public class GimbalAdapterService extends Service {
 					break;
 				case MSG_INTENT_JOB_FINISHED:
 					GimbalAdapter.shared().stop();
-					stopSelf(startId);
 					break;
 			}
 		}
@@ -87,6 +86,9 @@ public class GimbalAdapterService extends Service {
 	
 	@Override
 	public void onDestroy(){
+		Message msg = serviceHandler.obtainMessage(MSG_INTENT_JOB_FINISHED);
+		serviceHandler.sendMessage(msg);
+		
 		serviceLooper.quit();
 		
 		super.onDestroy();
