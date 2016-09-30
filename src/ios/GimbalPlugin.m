@@ -27,14 +27,16 @@
 #import "GimbalPlugin.h"
 #import "GimbalAdapter.h"
 #import <Cordova/CDVPlugin.h>
+#import <CoreLocation/CoreLocation.h>
 
+typedef void (^UACordovaCompletionHandler)(CDVCommandStatus, id);
+typedef void (^UACordovaExecutionBlock)(NSArray *args, UACordovaCompletionHandler completionHandler);
 
 @implementation GimbalPlugin
 
 // Config keys
 NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
-BOOL *const GimbalAutoStart = @"com.urbanairship.gimbal_auto_start";
-
+NSString *const GimbalAutoStart = @"com.urbanairship.gimbal_auto_start";
 
 - (void)pluginInitialize {
     
@@ -42,45 +44,105 @@ BOOL *const GimbalAutoStart = @"com.urbanairship.gimbal_auto_start";
     
     if (!settings[GimbalAPIKey]) {
         NSLog(@"No Gimbal API key found, Gimbal cordova plugin initialization failed.");
-        
         return;
     }
     
-    NSLog(@"Initializing Urban Airship Gimbal cordova plugin.");
-
+    // Grab the gimbal api key, start the adapter
+    NSLog(@"GIMBAL: setting API key");
     [Gimbal setAPIKey:settings[GimbalAPIKey] options:nil];
+    NSLog(@"GIMBAL: auto start gimbal adapter");
+    [[GimbalAdapter shared] startAdapter];
     
     if (settings[GimbalAutoStart]) {
-        if (GimbalAutoStart) {
+        NSLog(@"GimbalAutoStart key found.");
+        if ([GimbalAutoStart compare:@"true" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
+            NSLog(@"GimbalAutoStart key set to true, starting adapter.");
             [[GimbalAdapter shared] startAdapter];
         }
     }
 }
 
+- (void)performCallbackWithCommand:(CDVInvokedUrlCommand *)command withBlock:(UACordovaExecutionBlock)block {
+    [self.commandDelegate runInBackground:^{
+        UACordovaCompletionHandler completionHandler = ^(CDVCommandStatus status, id value) {
+            CDVPluginResult *result = [self pluginResultForValue:value status:status];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        };
+        
+        if (!block) {
+            completionHandler(CDVCommandStatus_OK, nil);
+        } else {
+            block(command.arguments, completionHandler);
+        }
+    }];
+}
+
+- (CDVPluginResult *)pluginResultForValue:(id)value status:(CDVCommandStatus)status{
+    
+    // String
+    if ([value isKindOfClass:[NSString class]]) {
+        return [CDVPluginResult resultWithStatus:status
+                                 messageAsString:[value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    }
+    
+    // Number
+    if ([value isKindOfClass:[NSNumber class]]) {
+        CFNumberType numberType = CFNumberGetType((CFNumberRef)value);
+        //note: underlyingly, BOOL values are typedefed as char
+        if (numberType == kCFNumberIntType || numberType == kCFNumberCharType) {
+            return [CDVPluginResult resultWithStatus:status messageAsInt:[value intValue]];
+        } else  {
+            return [CDVPluginResult resultWithStatus:status messageAsDouble:[value doubleValue]];
+        }
+    }
+    
+    // Array
+    if ([value isKindOfClass:[NSArray class]]) {
+        return [CDVPluginResult resultWithStatus:status messageAsArray:value];
+    }
+    
+    // Object
+    if ([value isKindOfClass:[NSDictionary class]]) {
+        return [CDVPluginResult resultWithStatus:status messageAsDictionary:value];
+    }
+    
+    // Null
+    if ([value isKindOfClass:[NSNull class]]) {
+        return [CDVPluginResult resultWithStatus:status];
+    }
+    
+    // Nil
+    if (!value) {
+        return [CDVPluginResult resultWithStatus:status];
+    }
+    
+    return [CDVPluginResult resultWithStatus:status];
+}
+
 - (void)start:(CDVInvokedUrlCommand *)command {
     [self performCallbackWithCommand:command withBlock:^(NSArray *args, UACordovaCompletionHandler completionHandler) {
-        [self startGimbal]
+        NSLog(@"GIMBAL: start from JS plugin");
+        [self startGimbal];
         completionHandler(CDVCommandStatus_OK, nil);
     }];
 }
 
 - (void)stop:(CDVInvokedUrlCommand *)command {
     [self performCallbackWithCommand:command withBlock:^(NSArray *args, UACordovaCompletionHandler completionHandler) {
-        [self stopGimbal]
+        NSLog(@"GIMBAL: stop from JS plugin");
+        [self stopGimbal];
         completionHandler(CDVCommandStatus_OK, nil);
     }];
 }
 
 - (void)startGimbal {
-
+    NSLog(@"GIMBAL: starting gimbal adapter");
     [[GimbalAdapter shared] startAdapter];
-
 }
 
 - (void)stopGimbal {
-
+    NSLog(@"GIMBAL: stopping gimbal");
     [[GimbalAdapter shared] stopAdapter];
-
 }
 
 @end
