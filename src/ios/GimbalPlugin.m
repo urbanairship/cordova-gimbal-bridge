@@ -36,7 +36,6 @@ typedef void (^UACordovaExecutionBlock)(NSArray *args, UACordovaCompletionHandle
 
 // Config keys
 NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
-NSString *const GimbalAutoStart = @"com.urbanairship.gimbal_auto_start";
 
 - (void)pluginInitialize {
     
@@ -52,14 +51,6 @@ NSString *const GimbalAutoStart = @"com.urbanairship.gimbal_auto_start";
     [Gimbal setAPIKey:settings[GimbalAPIKey] options:nil];
     NSLog(@"GIMBAL: auto start gimbal adapter");
     [[GimbalAdapter shared] startAdapter];
-    
-    if (settings[GimbalAutoStart]) {
-        NSLog(@"GimbalAutoStart key found.");
-        if ([GimbalAutoStart compare:@"true" options:NSCaseInsensitiveSearch] == NSOrderedSame) {
-            NSLog(@"GimbalAutoStart key set to true, starting adapter.");
-            [[GimbalAdapter shared] startAdapter];
-        }
-    }
 }
 
 - (void)performCallbackWithCommand:(CDVInvokedUrlCommand *)command withBlock:(UACordovaExecutionBlock)block {
