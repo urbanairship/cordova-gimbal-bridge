@@ -1,11 +1,12 @@
 {
   "name": "urbanairship-gimbal-bridge-cordova",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Urban Airship Cordova Gimbal plugin",
   "cordova": {
     "id": "urbanairship-gimbal-bridge-cordova",
     "platforms": [
-      "ios"
+      "ios",
+      "android"
     ]
   },
   "repository": {
@@ -16,7 +17,8 @@
     "cordova",
     "urbanairship",
     "ecosystem:cordova",
-    "cordova-ios"
+    "cordova-ios",
+    "cordova-android"
   ],
   "engines": [
     {
@@ -26,6 +28,10 @@
     {
       "name": "cordova-ios",
       "version": ">=3.9.0"
+    },
+    {
+      "name": "cordova-android",
+      "version": ">=4.1.0"
     },
     {
       "name": "cordova-plugman",

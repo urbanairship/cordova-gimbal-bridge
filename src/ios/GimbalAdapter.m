@@ -24,13 +24,13 @@
     if (self) {
         self.placeManager = [[GMBLPlaceManager alloc] init];
         self.placeManager.delegate = self;
-
+        
         // Hide the power alert by default
         if (![[NSUserDefaults standardUserDefaults] valueForKey:@"gmbl_hide_bt_power_alert_view"]) {
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"gmbl_hide_bt_power_alert_view"];
         }
     }
-
+    
     return self;
 }
 
@@ -40,13 +40,13 @@
 
 + (instancetype)shared {
     static dispatch_once_t onceToken = 0;
-
+    
     __strong static id _sharedObject = nil;
-
+    
     dispatch_once(&onceToken, ^{
         _sharedObject = [[self alloc] init];
     });
-
+    
     return _sharedObject;
 }
 
@@ -60,32 +60,34 @@
 }
 
 - (void)startAdapter {
-
+    
     if (self.started) {
+        NSLog(@"GIMBAL: adapter was already running");
         return;
     }
-
+    
+    NSLog(@"GIMBAL: start monitoring on place manager");
     [GMBLPlaceManager startMonitoring];
-
+    
     self.started = YES;
-
-    UA_LDEBUG(@"Started Gimbal Adapter.");
+    
+    NSLog(@"GIMBAL: started gimbal adapter finished");
 }
 
 - (void)stopAdapter {
-
+    
     if (self.started) {
-
+        
         [GMBLPlaceManager stopMonitoring];
         self.started = NO;
-
-        UA_LDEBUG(@"Stopped Gimbal Adapter.");
+        
+        NSLog(@"GIMBAL: stopped gimbal adapter");
     }
 }
 
 - (void)reportPlaceEventToAnalytics:(GMBLPlace *) place boundaryEvent:(UABoundaryEvent) boundaryEvent {
     UARegionEvent *regionEvent = [UARegionEvent regionEventWithRegionID:place.identifier source:kSource boundaryEvent:boundaryEvent];
-
+    
     [[UAirship shared].analytics addEvent:regionEvent];
 }
 
@@ -94,13 +96,13 @@
 
 - (void)placeManager:(GMBLPlaceManager *)manager didBeginVisit:(GMBLVisit *)visit {
     UA_LDEBUG(@"Entered a Gimbal Place: %@ on the following date: %@", visit.place.name, visit.arrivalDate);
-
+    
     [self reportPlaceEventToAnalytics:visit.place boundaryEvent:UABoundaryEventEnter];
 }
 
 - (void)placeManager:(GMBLPlaceManager *)manager didEndVisit:(GMBLVisit *)visit {
     UA_LDEBUG(@"Exited a Gimbal Place: %@ Entrance date:%@ Exit Date:%@", visit.place.name, visit.arrivalDate, visit.departureDate);
-
+    
     [self reportPlaceEventToAnalytics:visit.place boundaryEvent:UABoundaryEventExit];
 }
 
