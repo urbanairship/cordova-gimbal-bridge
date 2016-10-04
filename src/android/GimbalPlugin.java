@@ -34,6 +34,7 @@ import org.json.JSONException;
 
 import android.app.Application;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.Manifest;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
@@ -52,8 +53,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class GimbalPlugin extends CordovaPlugin {
-	
-	public static final String SERVICE_PARAM_GIMBAL_KEY = "gimbalKey";
 	
 	private static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
 	private static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
@@ -151,8 +150,11 @@ public class GimbalPlugin extends CordovaPlugin {
 		if (action != null){
 			serviceIntent.setAction(action);
 		}
-		serviceIntent.putExtra(SERVICE_PARAM_GIMBAL_KEY, gimbalKey);
-		activity.startService(serviceIntent);
+		serviceIntent.putExtra(GimbalAdapterService.GIMBAL_KEY, gimbalKey);
+		
+		if (!isServiceRunning(GimbalAdapterService.class)){
+			activity.startService(serviceIntent);
+		}
 		
 		if (callbackContext != null){
 			callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
@@ -192,6 +194,27 @@ public class GimbalPlugin extends CordovaPlugin {
                 }
 				break;
 		}
+	}
+	
+	private boolean isServiceRunning(Class<?> serviceClass) {
+		Activity activity = cordova.getActivity();
+		ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+		for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (serviceClass.getName().equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
+    }
+	
+	@Override
+	public void onDestroy(){
+		//Explicitly stop the service so destroy is called and we can trigger a restart
+		Activity activity = cordova.getActivity();
+		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
+		activity.stopService(serviceIntent);
+		
+		super.onDestroy();
 	}
 	
 	/**

@@ -12,7 +12,8 @@ import android.preference.PreferenceManager;
 import com.gimbal.android.Gimbal;
 
 public class GimbalAdapterService extends Service {
-	public static final String SERVICE_PARAM_GIMBAL_KEY = "gimbalKey";
+	public static final String GIMBAL_KEY = "gimbalKey";
+	public static final String INTENT_START = "com.urbanairship.cordova.gimbal.StartService";
 	
 	@Override
 	public void onCreate(){
@@ -24,15 +25,15 @@ public class GimbalAdapterService extends Service {
 		super.onStartCommand(intent, flags, startId);
 		
 		String action = null;
-		String gimbalKey = PreferenceManager.getDefaultSharedPreferences(this).getString(SERVICE_PARAM_GIMBAL_KEY, null);
+		String gimbalKey = PreferenceManager.getDefaultSharedPreferences(this).getString(GIMBAL_KEY, null);
 		if (intent != null){
 			action = intent.getAction();
 			
 			//setApiKey
 			Bundle extras = intent.getExtras();
 			if (extras != null){
-				gimbalKey = (String) extras.get(SERVICE_PARAM_GIMBAL_KEY);
-				PreferenceManager.getDefaultSharedPreferences(this).edit().putString(SERVICE_PARAM_GIMBAL_KEY, gimbalKey).commit(); 
+				gimbalKey = (String) extras.get(GIMBAL_KEY);
+				PreferenceManager.getDefaultSharedPreferences(this).edit().putString(GIMBAL_KEY, gimbalKey).commit(); 
 			}
 		}
 		if (gimbalKey == null){
@@ -53,6 +54,9 @@ public class GimbalAdapterService extends Service {
 		GimbalAdapter.shared().stop();
 		
 		super.onDestroy();
+		
+		//Restart service
+        sendBroadcast(new Intent(INTENT_START));
 	}
 	
 	@Override
