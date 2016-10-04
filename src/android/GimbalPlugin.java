@@ -91,7 +91,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		
 		//Start service and setApiKey without monitoring
 		//THE SERVICE MUST BE STARTED WITH THE API KEY SET BEFORE USER ACCEPTS PERMISSIONS!
-		doStart(Intent.ACTION_RUN);
+		initService();
 		
 		//Auto-start
 		if (pluginConfig.getBoolean(GIMBAL_AUTO_START, true)){
@@ -123,6 +123,15 @@ public class GimbalPlugin extends CordovaPlugin {
 		return true;
 	}
 	
+	public void initService(){
+		Activity activity = cordova.getActivity();
+		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
+		serviceIntent.setAction(GimbalAdapterService.INTENT_INIT);
+		serviceIntent.putExtra(GimbalAdapterService.GIMBAL_KEY, gimbalKey);
+		
+		activity.startService(serviceIntent);
+	}
+	
 	public void start(JSONArray data, CallbackContext callbackContext){
 		this.callbackContext = callbackContext;
 		start();
@@ -131,7 +140,7 @@ public class GimbalPlugin extends CordovaPlugin {
 	public void start(){
 		//Android M permissions
 		if (cordova.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
-			doStart();
+			startMonitoring();
 		} else {
 			String[] permissions = {
 				Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -141,17 +150,10 @@ public class GimbalPlugin extends CordovaPlugin {
 		}
 	}
 	
-	private void doStart(){
-		doStart(null);
-	}
-	
-	private void doStart(String action){
+	private void startMonitoring(){
 		Activity activity = cordova.getActivity();
 		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
-		if (action != null){
-			serviceIntent.setAction(action);
-		}
-		serviceIntent.putExtra(GimbalAdapterService.GIMBAL_KEY, gimbalKey);
+		serviceIntent.setAction(GimbalAdapterService.INTENT_START);
 		
 		activity.startService(serviceIntent);
 		
@@ -162,13 +164,17 @@ public class GimbalPlugin extends CordovaPlugin {
 	}
 	
 	public void stop(JSONArray data, CallbackContext callbackContext){
-		stop();
+		stopMonitoring();
 		callbackContext.success();
 	}
 	
-	public void stop(){
+	public void stopMonitoring(){
 		Activity activity = cordova.getActivity();
-		activity.stopService(new Intent(activity, GimbalAdapterService.class));
+		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
+		serviceIntent.setAction(GimbalAdapterService.INTENT_STOP);
+		
+		//Send new intent to stop
+		activity.startService(serviceIntent);
 	}
 	
 	@Override
@@ -185,7 +191,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		switch (requestCode){
 			case PERMISSION_REQUEST_CODE_LOCATION:
 				try {
-					doStart();
+					startMonitoring();
 				} catch (Exception e){
 					if (callbackContext != null){
 						callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, e.getMessage()));

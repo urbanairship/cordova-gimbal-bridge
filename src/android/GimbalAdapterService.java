@@ -19,8 +19,11 @@ import com.urbanairship.location.RegionEvent;
 import com.urbanairship.util.DateUtils;
 
 public class GimbalAdapterService extends Service {
-	public static final String GIMBAL_KEY = "gimbalKey";
+	public static final String INTENT_INIT = "com.urbanairship.cordova.gimbal.InitService";
 	public static final String INTENT_START = "com.urbanairship.cordova.gimbal.StartService";
+	public static final String INTENT_STOP = "com.urbanairship.cordova.gimbal.StopService";
+	
+	public static final String GIMBAL_KEY = "gimbalKey";
 	
     private static final String TAG = "GimbalAdapter ";
     private static final String SOURCE = "Gimbal";
@@ -59,6 +62,7 @@ public class GimbalAdapterService extends Service {
 		String gimbalKey = PreferenceManager.getDefaultSharedPreferences(this).getString(GIMBAL_KEY, null);
 		if (intent != null){
 			action = intent.getAction();
+			Log.i(TAG, "GimbalAdapterService Intent Action: " + action);
 
 			//setApiKey
 			Bundle extras = intent.getExtras();
@@ -72,18 +76,20 @@ public class GimbalAdapterService extends Service {
 		}
 		Gimbal.setApiKey(this.getApplication(), gimbalKey);
 		
-		//startMonitoring
-		if (!Intent.ACTION_RUN.equals(action)){
-			start();
+		//startMonitoring by default
+		if (INTENT_START.equals(action) || !INTENT_INIT.equals(action) && !INTENT_STOP.equals(action)){
+			startMonitoring();
+		} else if (INTENT_STOP.equals(action)){
+			stopMonitoring();
 		}
-
+		
 		return START_STICKY;
 	}
 	
 	/**
 	 * Starts tracking places.
 	 */
-	public void start(){
+	public void startMonitoring(){
 		PlaceManager placeManager = PlaceManager.getInstance();
 		if (!placeManager.isMonitoring()){
 			placeManager.addListener(placeEventListener);
@@ -95,24 +101,25 @@ public class GimbalAdapterService extends Service {
 	/**
 	 * Stops tracking places.
 	 */
-	public void stop(){
+	public void stopMonitoring(){
 		PlaceManager placeManager = PlaceManager.getInstance();
 		if (placeManager.isMonitoring()){
 			placeManager.stopMonitoring();
 			placeManager.removeListener(placeEventListener);
-			placeEventListener = null;
 			Log.i(TAG, "Adapter Stopped");
 		}
 	}
 
 	@Override
 	public void onDestroy(){
-		stop();
+		stopMonitoring();
+		placeEventListener = null;
 		
 		super.onDestroy();
 		
 		//Restart service
-		sendBroadcast(new Intent(INTENT_START));
+		Intent intent = new Intent(INTENT_START);
+		sendBroadcast(intent);
 	}
 
 	@Override
