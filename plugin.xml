@@ -73,7 +73,6 @@
 		</config-file>
 		
 		<source-file src="src/android/GimbalPlugin.java" target-dir="src/com/urbanairship/cordova/gimbal" />
-		<source-file src="src/android/GimbalAdapter.java" target-dir="src/com/urbanairship/cordova/gimbal" />
 		<source-file src="src/android/GimbalAdapterService.java" target-dir="src/com/urbanairship/cordova/gimbal" />
 		<source-file src="src/android/GimbalAdapterReceiver.java" target-dir="src/com/urbanairship/cordova/gimbal" />
     </platform>
