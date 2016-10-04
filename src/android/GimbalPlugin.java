@@ -34,7 +34,6 @@ import org.json.JSONException;
 
 import android.app.Application;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.Manifest;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
@@ -154,9 +153,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		}
 		serviceIntent.putExtra(GimbalAdapterService.GIMBAL_KEY, gimbalKey);
 		
-		if (!isServiceRunning(GimbalAdapterService.class)){
-			activity.startService(serviceIntent);
-		}
+		activity.startService(serviceIntent);
 		
 		if (callbackContext != null){
 			callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
@@ -197,17 +194,6 @@ public class GimbalPlugin extends CordovaPlugin {
 				}
 				break;
 		}
-	}
-	
-	private boolean isServiceRunning(Class<?> serviceClass){
-		Activity activity = cordova.getActivity();
-		ActivityManager manager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
-		for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-			if (serviceClass.getName().equals(service.service.getClassName())){
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	@Override
