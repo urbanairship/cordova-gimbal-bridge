@@ -14,12 +14,12 @@ import com.gimbal.android.Gimbal;
 public class GimbalAdapterService extends Service {
 	public static final String GIMBAL_KEY = "gimbalKey";
 	public static final String INTENT_START = "com.urbanairship.cordova.gimbal.StartService";
-	
+
 	@Override
 	public void onCreate(){
 		super.onCreate();
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		super.onStartCommand(intent, flags, startId);
@@ -28,12 +28,12 @@ public class GimbalAdapterService extends Service {
 		String gimbalKey = PreferenceManager.getDefaultSharedPreferences(this).getString(GIMBAL_KEY, null);
 		if (intent != null){
 			action = intent.getAction();
-			
+
 			//setApiKey
 			Bundle extras = intent.getExtras();
 			if (extras != null){
 				gimbalKey = (String) extras.get(GIMBAL_KEY);
-				PreferenceManager.getDefaultSharedPreferences(this).edit().putString(GIMBAL_KEY, gimbalKey).commit(); 
+				PreferenceManager.getDefaultSharedPreferences(this).edit().putString(GIMBAL_KEY, gimbalKey).commit();
 			}
 		}
 		if (gimbalKey == null){
@@ -45,20 +45,20 @@ public class GimbalAdapterService extends Service {
 		if (!Intent.ACTION_RUN.equals(action)){
 			GimbalAdapter.shared().start();
 		}
-		
+
 		return START_STICKY;
 	}
-	
+
 	@Override
 	public void onDestroy(){
 		GimbalAdapter.shared().stop();
-		
+
 		super.onDestroy();
 		
 		//Restart service
-        sendBroadcast(new Intent(INTENT_START));
+		sendBroadcast(new Intent(INTENT_START));
 	}
-	
+
 	@Override
 	public IBinder onBind(Intent intent){
 		return null;
