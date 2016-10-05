@@ -25,8 +25,8 @@ public class GimbalAdapterService extends Service {
 	
 	public static final String GIMBAL_KEY = "gimbalKey";
 	
-    private static final String TAG = "GimbalAdapter ";
-    private static final String SOURCE = "Gimbal";
+	private static final String TAG = "GimbalAdapter ";
+	private static final String SOURCE = "Gimbal";
 	
 	private PlaceEventListener placeEventListener;
 	
@@ -53,7 +53,7 @@ public class GimbalAdapterService extends Service {
 			}
 		};
 	}
-
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId){
 		super.onStartCommand(intent, flags, startId);
@@ -63,7 +63,7 @@ public class GimbalAdapterService extends Service {
 		if (intent != null){
 			action = intent.getAction();
 			Log.i(TAG, "GimbalAdapterService Intent Action: " + action);
-
+			
 			//setApiKey
 			Bundle extras = intent.getExtras();
 			if (extras != null){
@@ -97,7 +97,7 @@ public class GimbalAdapterService extends Service {
 			Log.i(TAG, "Adapter Started");
 		}
 	}
-
+	
 	/**
 	 * Stops tracking places.
 	 */
@@ -109,7 +109,7 @@ public class GimbalAdapterService extends Service {
 			Log.i(TAG, "Adapter Stopped");
 		}
 	}
-
+	
 	@Override
 	public void onDestroy(){
 		stopMonitoring();
@@ -117,7 +117,7 @@ public class GimbalAdapterService extends Service {
 		
 		super.onDestroy();
 	}
-
+	
 	@Override
 	public IBinder onBind(Intent intent){
 		return null;
