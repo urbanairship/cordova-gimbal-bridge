@@ -173,7 +173,7 @@ public class GimbalPlugin extends CordovaPlugin {
 		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
 		serviceIntent.setAction(GimbalAdapterService.INTENT_STOP);
 		
-		//Send new intent to stop
+		//Send new intent to stop monitoring
 		activity.startService(serviceIntent);
 	}
 	
@@ -204,10 +204,7 @@ public class GimbalPlugin extends CordovaPlugin {
 	
 	@Override
 	public void onDestroy(){
-		//Explicitly stop the service so destroy is called and we can trigger a restart
-		Activity activity = cordova.getActivity();
-		Intent serviceIntent = new Intent(activity, GimbalAdapterService.class);
-		activity.stopService(serviceIntent);
+		stopMonitoring();
 		
 		super.onDestroy();
 	}

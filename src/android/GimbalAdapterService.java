@@ -116,10 +116,6 @@ public class GimbalAdapterService extends Service {
 		placeEventListener = null;
 		
 		super.onDestroy();
-		
-		//Restart service
-		Intent intent = new Intent(INTENT_START);
-		sendBroadcast(intent);
 	}
 
 	@Override
