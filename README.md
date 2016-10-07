@@ -19,8 +19,7 @@ Requirements:
 
 ## Permissions
 
-This plugin requires location access and supports the Android M permission model. The plugin will prompt for permission when it starts. By default the plugin starts as soon as the app is opened. For Android you have the option to disable auto-start in favor of calling start manually. This gives you control over when the permission dialog is displayed.
-To disable auto-start on Android add this preference to the config.xml file:
+This plugin requires location access for both Android and iOS. Once Gimbal is started, the plugin will prompt the user for permission. By default the plugin starts as soon as the app is opened. You have the option to disable auto-start in favor of calling start manually. This gives you control over when the permission dialog is displayed. To disable auto-start add this preference to the config.xml file:
 
 ```xml
 	<preference name="com.urbanairship.gimbal_auto_start" value="false" />
