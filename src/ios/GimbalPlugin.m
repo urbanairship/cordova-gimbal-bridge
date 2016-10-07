@@ -1,16 +1,16 @@
 /*
  Copyright 2009-2015 Urban Airship Inc. All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
- 
+
  1. Redistributions of source code must retain the above copyright notice, this
  list of conditions and the following disclaimer.
- 
+
  2. Redistributions in binary form must reproduce the above copyright notice,
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE URBAN AIRSHIP INC ``AS IS'' AND ANY EXPRESS OR
  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -36,21 +36,24 @@ typedef void (^UACordovaExecutionBlock)(NSArray *args, UACordovaCompletionHandle
 
 // Config keys
 NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
+NSString *const GimbalAutoStartKey = @"com.urbanairship.gimbal_auto_start";
 
 - (void)pluginInitialize {
-    
     NSDictionary *settings = self.commandDelegate.settings;
-    
+
     if (!settings[GimbalAPIKey]) {
         NSLog(@"No Gimbal API key found, Gimbal cordova plugin initialization failed.");
         return;
     }
-    
+
     // Grab the gimbal api key, start the adapter
     NSLog(@"GIMBAL: setting API key");
     [Gimbal setAPIKey:settings[GimbalAPIKey] options:nil];
-    NSLog(@"GIMBAL: auto start gimbal adapter");
-    [[GimbalAdapter shared] startAdapter];
+
+    if (settings[GimbalAutoStartKey] == nil || [settings[GimbalAutoStartKey] boolValue]) {
+        NSLog(@"GIMBAL: auto start gimbal adapter");
+        [[GimbalAdapter shared] startAdapter];
+    }
 }
 
 - (void)performCallbackWithCommand:(CDVInvokedUrlCommand *)command withBlock:(UACordovaExecutionBlock)block {
@@ -59,7 +62,7 @@ NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
             CDVPluginResult *result = [self pluginResultForValue:value status:status];
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         };
-        
+
         if (!block) {
             completionHandler(CDVCommandStatus_OK, nil);
         } else {
@@ -69,13 +72,13 @@ NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
 }
 
 - (CDVPluginResult *)pluginResultForValue:(id)value status:(CDVCommandStatus)status{
-    
+
     // String
     if ([value isKindOfClass:[NSString class]]) {
         return [CDVPluginResult resultWithStatus:status
                                  messageAsString:[value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     }
-    
+
     // Number
     if ([value isKindOfClass:[NSNumber class]]) {
         CFNumberType numberType = CFNumberGetType((CFNumberRef)value);
@@ -86,27 +89,27 @@ NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
             return [CDVPluginResult resultWithStatus:status messageAsDouble:[value doubleValue]];
         }
     }
-    
+
     // Array
     if ([value isKindOfClass:[NSArray class]]) {
         return [CDVPluginResult resultWithStatus:status messageAsArray:value];
     }
-    
+
     // Object
     if ([value isKindOfClass:[NSDictionary class]]) {
         return [CDVPluginResult resultWithStatus:status messageAsDictionary:value];
     }
-    
+
     // Null
     if ([value isKindOfClass:[NSNull class]]) {
         return [CDVPluginResult resultWithStatus:status];
     }
-    
+
     // Nil
     if (!value) {
         return [CDVPluginResult resultWithStatus:status];
     }
-    
+
     return [CDVPluginResult resultWithStatus:status];
 }
 
