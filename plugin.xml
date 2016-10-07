@@ -15,9 +15,8 @@
         <engine name="cordova-plugman" version=">=4.2.0"/>
     </engines>
 
-    <dependency id="urbanairship-cordova"/>
-    <dependency id="urbanairship-gimbal-sdk-cordova"
-                url="https://github.com/urbanairship/cordova-gimbal-sdk"/>
+    <dependency id="urbanairship-cordova" version=">=6.2.0"/>
+    <dependency id="urbanairship-gimbal-sdk-cordova" url="https://github.com/urbanairship/cordova-gimbal-sdk"/>
 
     <js-module name="UrbanAirship" src="www/UAGimbal.js">
         <clobbers target="UAGimbal"/>
