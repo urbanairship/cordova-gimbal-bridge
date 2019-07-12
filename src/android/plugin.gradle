@@ -1,0 +1,11 @@
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+dependencies {
+  implementation 'com.urbanairship.android:gimbal-adapter:3.0.0'
+}
