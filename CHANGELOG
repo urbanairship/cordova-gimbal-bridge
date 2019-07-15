@@ -2,7 +2,7 @@
 Version 3.0.0 - July 15, 2019
 ===============================
  - Updated Gimbal bridge to be compatible with Airship location modules on iOS and Android.
- - Gimbal bridge now requires the airship-location-cordova plugin >= 11.1.0, cordova >= 9.0.0, cordova-ios >= 5.0.1, cococapods >= 1.7.3
+ - Gimbal bridge now requires the cordova >= 9.0.0, cordova-ios >= 5.0.1, cococapods >= 1.7.3
 
 ===============================
 Version 2.0.1 - April 5, 2018
