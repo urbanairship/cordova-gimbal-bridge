@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin id="urbanairship-gimbal-bridge-cordova"
-        version="2.0.1"
+        version="3.0.0"
         xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -11,12 +11,12 @@
     <repo>https://github.com/urbanairship/cordova-gimbal-bridge</repo>
 
     <engines>
-        <engine name="cordova" version=">=5.4.0"/>
+        <engine name="cordova" version=">=9.0.0"/>
+        <engine name="cordova-ios" version=">=5.0.1"/>
         <engine name="cordova-plugman" version=">=4.2.0"/>
     </engines>
 
     <dependency id="urbanairship-cordova" version=">=6.2.0"/>
-    <dependency id="urbanairship-gimbal-sdk-cordova" url="https://github.com/urbanairship/cordova-gimbal-sdk"/>
 
     <js-module name="UrbanAirship" src="www/UAGimbal.js">
         <clobbers target="UAGimbal"/>
@@ -38,6 +38,16 @@
         <!-- Gimbal Adapter -->
         <header-file src="src/ios/GimbalAdapter.h"/>
         <source-file src="src/ios/GimbalAdapter.m"/>
+
+        <!-- Gimbal library -->
+        <podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git"/>
+            </config>
+            <pods use-frameworks="true">
+                <pod name="Gimbal" spec="2.80.2" />
+            </pods>
+        </podspec>
     </platform>
 
     <!-- android -->
@@ -49,24 +59,9 @@
             </feature>
         </config-file>
 
-
-        <!-- AirshipReady Receiver -->
-        <config-file parent="/manifest/application" target="AndroidManifest.xml">
-            <receiver
-                android:name="com.urbanairship.cordova.gimbal.AirshipReadyReceiver"
-                android:exported="false">
-
-                <intent-filter>
-                    <action android:name="com.urbanairship.AIRSHIP_READY"/>
-                    <category android:name="$PACKAGE_NAME"/>
-                </intent-filter>
-
-            </receiver>
-        </config-file>
-
-        <source-file src="src/android/AirshipReadyReceiver.java" target-dir="src/com/urbanairship/cordova/gimbal"/>
-        <source-file src="src/android/GimbalAdapter.java" target-dir="src/com/urbanairship/cordova/gimbal"/>
         <source-file src="src/android/GimbalPlugin.java" target-dir="src/com/urbanairship/cordova/gimbal"/>
         <source-file src="src/android/GimbalPluginConfig.java" target-dir="src/com/urbanairship/cordova/gimbal"/>
+
+        <framework custom="true" src="src/android/plugin.gradle" type="gradleReference"/>
     </platform>
 </plugin>
