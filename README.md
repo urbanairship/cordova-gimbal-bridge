@@ -1,7 +1,7 @@
 # Urban Airship Gimbal PhoneGap/Cordova Plugin
 
 Requirements:
- - Cordova 9.0.0+, and Cordova iOS 5.0.1+, urbanairship-cordova plugin, airship-location-cordova plugin
+ - cordova 9.0.0+, and cordova-ios 5.0.1+, urbanairship-cordova plugin 8.0.0+
 
 ## Installation
 
