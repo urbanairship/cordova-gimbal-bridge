@@ -35,7 +35,7 @@ typedef void (^UACordovaExecutionBlock)(NSArray *args, UACordovaCompletionHandle
 @implementation GimbalPlugin
 
 // Config keys
-NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
+NSString *const GimbalAPIKey = @"com.urbanairship.ios_gimbal_api_key";
 NSString *const GimbalAutoStartKey = @"com.urbanairship.gimbal_auto_start";
 
 - (void)pluginInitialize {

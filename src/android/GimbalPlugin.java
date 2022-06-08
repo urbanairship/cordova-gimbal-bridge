@@ -31,6 +31,8 @@ public class GimbalPlugin extends CordovaPlugin {
         super.initialize(cordova, webView);
         Log.i(TAG, "Initializing Urban Airship Gimbal cordova plugin.");
 
+        GimbalAdapter.shared(cordova.getActivity()).enableGimbalApiKeyManagement(getGimbalKey());
+
         if (GimbalPluginConfig.getInstance(cordova.getActivity()).getAutoStart()) {
             Log.i(TAG, "Auto starting Gimbal Adapter.");
             start(null);
@@ -74,7 +76,7 @@ public class GimbalPlugin extends CordovaPlugin {
     private void start(CallbackContext callbackContext) {
         isStarted = true;
 
-        GimbalAdapter.shared(cordova.getActivity()).startWithPermissionPrompt(getGimbalKey(), new GimbalAdapter.PermissionResultCallback() {
+        GimbalAdapter.shared(cordova.getActivity()).startWithPermissionPrompt(new GimbalAdapter.PermissionResultCallback() {
             @Override
             public void onResult(boolean enabled) {
                 PluginLogger.debug("Gimbal Plugin attempted to start with result: %s", enabled);
