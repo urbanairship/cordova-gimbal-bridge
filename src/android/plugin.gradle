@@ -9,5 +9,5 @@ allprojects {
 dependencies {
   implementation 'com.urbanairship.android:gimbal-adapter:7.4.0'
   // Google Play Services
-  implementation "com.google.android.gms:play-services-location:19.0.1"
+  implementation "com.google.android.gms:play-services-location:20.0.0"
 }

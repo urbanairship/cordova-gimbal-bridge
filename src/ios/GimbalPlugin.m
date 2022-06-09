@@ -35,20 +35,26 @@ typedef void (^UACordovaExecutionBlock)(NSArray *args, UACordovaCompletionHandle
 @implementation GimbalPlugin
 
 // Config keys
-NSString *const GimbalAPIKey = @"com.urbanairship.ios_gimbal_api_key";
+NSString *const GimbalAPIKey = @"com.urbanairship.gimbal_api_key";
+NSString *const IOSGimbalAPIKey = @"com.urbanairship.ios_gimbal_api_key";
 NSString *const GimbalAutoStartKey = @"com.urbanairship.gimbal_auto_start";
 
 - (void)pluginInitialize {
     NSDictionary *settings = self.commandDelegate.settings;
 
-    if (!settings[GimbalAPIKey]) {
-        NSLog(@"No Gimbal API key found, Gimbal cordova plugin initialization failed.");
-        return;
+    NSString *gimbalKey = settings[IOSGimbalAPIKey];
+
+    if (!gimbalKey) {
+        if (!settings[GimbalAPIKey]) {
+            NSLog(@"No Gimbal API key found, Gimbal cordova plugin initialization failed.");
+            return;
+        }
+        gimbalKey = settings[GimbalAPIKey];
     }
 
     // Grab the gimbal api key, start the adapter
     NSLog(@"GIMBAL: setting API key");
-    [Gimbal setAPIKey:settings[GimbalAPIKey] options:nil];
+    [Gimbal setAPIKey:gimbalKey options:nil];
 
     if (settings[GimbalAutoStartKey] == nil || [settings[GimbalAutoStartKey] boolValue]) {
         NSLog(@"GIMBAL: auto start gimbal adapter");
