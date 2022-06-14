@@ -45,7 +45,7 @@
                 <source url="https://github.com/CocoaPods/Specs.git"/>
             </config>
             <pods use-frameworks="true">
-                <pod name="Gimbal" spec="2.80.2" />
+                <pod name="AirshipGimbalAdapter" spec="4.1.0" />
             </pods>
         </podspec>
     </platform>

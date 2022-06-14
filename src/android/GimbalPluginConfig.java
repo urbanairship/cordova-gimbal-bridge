@@ -20,6 +20,7 @@ import java.util.Map;
 public class GimbalPluginConfig {
 
     private static final String GIMBAL_KEY = "com.urbanairship.gimbal_api_key";
+    private static final String ANDROID_GIMBAL_KEY = "com.urbanairship.android_gimbal_api_key";
     private static final String GIMBAL_AUTO_START = "com.urbanairship.gimbal_auto_start";
     private static final String UA_PREFIX = "com.urbanairship";
 
@@ -55,7 +56,7 @@ public class GimbalPluginConfig {
      * @return The Gimbal key.
      */
     public String getGimbalKey() {
-        return getString(GIMBAL_KEY, null);
+        return getString(ANDROID_GIMBAL_KEY, getString(GIMBAL_KEY, null));
     }
 
     /**

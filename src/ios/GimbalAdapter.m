@@ -3,10 +3,8 @@
  */
 
 #import "GimbalAdapter.h"
-#import "UAPush.h"
-#import "UAirship.h"
-#import "UARegionEvent.h"
-#import "UAAnalytics.h"
+
+@import AirshipKit;
 
 #define kSource @"Gimbal"
 
@@ -88,7 +86,7 @@
 - (void)reportPlaceEventToAnalytics:(GMBLPlace *) place boundaryEvent:(UABoundaryEvent) boundaryEvent {
     UARegionEvent *regionEvent = [UARegionEvent regionEventWithRegionID:place.identifier source:kSource boundaryEvent:boundaryEvent];
     
-    [[UAirship shared].analytics addEvent:regionEvent];
+    [UAirship.analytics addEvent:regionEvent];
 }
 
 #pragma mark -
