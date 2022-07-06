@@ -17,6 +17,9 @@ Requirements:
 	<preference name="com.urbanairship.gimbal_api_key" value="Your Gimbal API Key" />
 ```
 
+You can also use `com.urbanairship.android_gimbal_api_key` and `com.urbanairship.ios_gimbal_api_key` if you have one gimbal API key for each platform.
+
+
 ## Permissions
 
 This plugin requires location access for both Android and iOS. Once Gimbal is started, the plugin will prompt the user for permission. By default the plugin starts as soon as the app is opened. You have the option to disable auto-start in favor of calling start manually. This gives you control over when the permission dialog is displayed. To disable auto-start add this preference to the config.xml file:
