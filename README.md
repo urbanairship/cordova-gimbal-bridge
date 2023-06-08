@@ -1,4 +1,5 @@
 # Urban Airship Gimbal PhoneGap/Cordova Plugin
+**_Please note: this repo is no longer supported. Please use [this](https://github.com/gimbalinc/airship-adapter-cordova) official Infillion version instead._**
 
 Requirements:
  - cordova 9.0.0+, and cordova-ios 5.0.1+, urbanairship-cordova plugin 8.0.0+
